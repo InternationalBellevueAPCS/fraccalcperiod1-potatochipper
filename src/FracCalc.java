@@ -1,11 +1,24 @@
+import java.util.Scanner;
 public class FracCalc {
-
     /**
      * Prompts user for input, passes that input to produceAnswer, then outputs the result.
      * @param args - unused
      */
-    public static void main(String[] args) 
-    {
+    public static void main(String[] args) {
+    	Scanner console = new Scanner(System.in);
+    	String answerProduced; // for checkpoint 1
+    	
+    	boolean running = true;
+    	while (running) {
+    		System.out.println("Enter a problem or \"quit\" to exit. ");
+    		String input = console.nextLine();
+    		if (input.toLowerCase().contains("quit")) {
+    			running = false;
+    		} else {
+    			answerProduced = produceAnswer(input);
+    			System.out.println("Your input: " + answerProduced);
+    		}
+    	}
         // TODO: Read the input from the user and call produceAnswer with an equation
         // Checkpoint 1: Create a Scanner, read one line of input, pass that input to produceAnswer, print the result.
         // Checkpoint 2: Accept user input multiple times.
@@ -21,6 +34,23 @@ public class FracCalc {
     public static String produceAnswer(String input)
     { 
         // TODO: Implement this function to produce the solution to the input
+    	int spacesEncountered = 0;
+    	String firstOperand = "";
+    	String operator = "";
+    	String secondOperand = "";
+    	for (int i = 0; i < input.length(); i++) {
+    		if (input.charAt(i) == ' ') { 
+    			spacesEncountered++;
+    			if (spacesEncountered == 1) {
+    				firstOperand = input.substring(0, i);
+    				operator = input.substring(i, i + 2); // IMPORTANT: the operator is couched btwn spaces, like " + "
+    			}
+    			if(spacesEncountered == 2) { // so before this comes diff. behaviors at each space number: 1st operand, operation sign, 2nd operand
+    				secondOperand = input.substring(i);
+    			}
+    		}
+    	}
+    	
         // Checkpoint 1: Return the second operand.  Example "4/5 * 1_2/4" returns "1_2/4".
         // Checkpoint 2: Return the second operand as a string representing each part.
         //               Example "4/5 * 1_2/4" returns "whole:1 numerator:2 denominator:4".
@@ -30,7 +60,7 @@ public class FracCalc {
         // Final project: All answers must be reduced.
         //               Example "4/5 * 1_2/4" returns "1_1/5".
         
-        return "";
+        return secondOperand;
     }
 
     // TODO: Fill in the space below with helper methods

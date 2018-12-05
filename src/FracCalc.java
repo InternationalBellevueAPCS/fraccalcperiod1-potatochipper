@@ -46,7 +46,7 @@ public class FracCalc {
     				operator = input.substring(i, i + 2); // IMPORTANT: the operator is couched btwn spaces, like " + "
     			}
     			if(spacesEncountered == 2) { // so before this comes diff. behaviors at each space number: 1st operand, operation sign, 2nd operand
-    				secondOperand = input.substring(i);
+    				secondOperand = input.substring(i+1);
     			}
     		}
     	}

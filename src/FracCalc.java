@@ -8,6 +8,8 @@ public class FracCalc {
     	Scanner console = new Scanner(System.in);
     	String answerProduced; // for checkpoint 1
     	
+    	System.out.println("For now, please enter spaces between operands and the operator.");
+    	
     	boolean running = true;
     	while (running) {
     		System.out.println("Enter a problem or \"quit\" to exit. ");
@@ -41,15 +43,25 @@ public class FracCalc {
     	for (int i = 0; i < input.length(); i++) {
     		if (input.charAt(i) == ' ') { 
     			spacesEncountered++;
-    			if (spacesEncountered == 1) {
+    			if (spacesEncountered == 1) { // like this, it won't work at all if there are no spaces.
     				firstOperand = input.substring(0, i);
-    				operator = input.substring(i, i + 2); // IMPORTANT: the operator is couched btwn spaces, like " + "
+    				operator = Character.toString(input.charAt(i+1)); 
     			}
     			if(spacesEncountered == 2) { // so before this comes diff. behaviors at each space number: 1st operand, operation sign, 2nd operand
     				secondOperand = input.substring(i+1);
     			}
     		}
     	}
+    	/*int whole = findWhole(firstOperand); //eventually these variables will need to be renamed
+    	int numerator = findNum(firstOperand);
+    	int denominator = findDen(firstOperand);*/
+    	
+    	int whole = findWhole(secondOperand);
+    	int numerator = findNum(secondOperand);
+    	int denominator = findDen(secondOperand);
+    	
+    	String returnForTest = "whole:" + whole + " numerator:" + numerator + " denominator:" + denominator;
+    	System.out.println(returnForTest);
     	
         // Checkpoint 1: Return the second operand.  Example "4/5 * 1_2/4" returns "1_2/4".
         // Checkpoint 2: Return the second operand as a string representing each part.
@@ -60,10 +72,51 @@ public class FracCalc {
         // Final project: All answers must be reduced.
         //               Example "4/5 * 1_2/4" returns "1_1/5".
         
-        return secondOperand;
+        return returnForTest;
     }
 
     // TODO: Fill in the space below with helper methods
+    public static int findWhole(String num) { // takes either the first or second operand
+    	int whole = 0; 
+    	for (int i = 0; i < num.length(); i++) {
+    		if (num.charAt(i) == '_') {
+    			String temp = num.substring(0, i);
+    			whole = Integer.parseInt(temp);
+    		} 
+    	} if (whole == 0) {
+    		String temp = num;
+			whole = Integer.parseInt(temp);
+    	}
+    	return whole;
+    }
+    
+    public static int findNum(String num) { 
+    	int numerator = 0; 
+    	int start = 0;
+    	for (int i = 0; i < num.length(); i++) {
+    		if (num.charAt(i) == '_') {
+    			start = i+1;
+    		}
+    		if (num.charAt(i) == '/') {
+    			String temp = num.substring(start , i);
+    			numerator = Integer.parseInt(temp);
+    		}
+    	}
+    	return numerator;
+    }
+    
+    public static int findDen(String num) {
+    	int denominator = 0; 
+    	for (int i = 0; i < num.length(); i++) {
+    		if (num.charAt(i) == '/') {
+    			String temp = num.substring(i+1);
+    			denominator = Integer.parseInt(temp);
+    		}
+    	}
+    	return denominator;
+    }
+    
+    // methods for num and denom set up just like that but instead before and after '/'
     
     /**
      * greatestCommonDivisor - Find the largest integer that evenly divides two integers.

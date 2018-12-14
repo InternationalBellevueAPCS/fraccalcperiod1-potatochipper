@@ -1,4 +1,8 @@
 import java.util.Scanner;
+/**
+ * @author s-wangka
+ *
+ */
 public class FracCalc {
     /**
      * Prompts user for input, passes that input to produceAnswer, then outputs the result.
@@ -6,27 +10,21 @@ public class FracCalc {
      */
     public static void main(String[] args) {
     	Scanner console = new Scanner(System.in);
-    	// String answerProduced; for checkpoint 1, will remove later
     	
     	System.out.println("Please enter spaces between operands and the operator.");
     	
     	boolean running = true;
+    	
     	while (running) {
     		System.out.println("Enter a problem or \"quit\" to exit. ");
     		String input = console.nextLine();
     		if (input.toLowerCase().contains("quit")) {
     			running = false;
-    		} /*else {
-    			answerProduced = produceAnswer(input);
-    			System.out.println("Your input: " + answerProduced);
-    		} Removed since it's an artifact from Checkpoint 1 */
-    		else {
-    			System.out.println(produceAnswer(input)); // This is where the program prints the answer, even though it's produced in produceAnswer
+    		} else {
+    			System.out.println(produceAnswer(input)); // All work done outside of main
+    			// This is where the program prints the answer, even though it's produced in produceAnswer
     		}
     	}
-        // TODO: Read the input from the user and call produceAnswer with an equation
-        // Checkpoint 1: Create a Scanner, read one line of input, pass that input to produceAnswer, print the result.
-        // Checkpoint 2: Accept user input multiple times.
     }
     
     /**
@@ -38,7 +36,6 @@ public class FracCalc {
      */
     public static String produceAnswer(String input)
     { 
-        // TODO: Implement this function to produce the solution to the input
     	int spacesEncountered = 0; // It identifies each part of the equation by how many spaces come before them
     	String firstOperand = "";
     	String operator = "";
@@ -59,28 +56,15 @@ public class FracCalc {
     	
     	// After the processing that happens in the String traversal for loop, we've separated the input into parts
     	// Now it's time to break these parts down further into their components
-    	// boolean positive1 = isPositive(firstOperand); // These four variables are all for the 1st operand 
+    	// These variables are all for the 1st operand 
     	int whole1 = findWhole(firstOperand); 
     	int numerator1 = findNume(firstOperand);
     	int denominator1 = findDen(firstOperand);
     	
-    	// boolean positive2 = isPositive(secondOperand); // These four variables are all for the 2nd operand
+    	// These variables are all for the 2nd operand
     	int whole2 = findWhole(secondOperand); 
     	int numerator2 = findNume(secondOperand);
     	int denominator2 = findDen(secondOperand);
-    	
-    	String returnForTest = "whole:" + whole2 + " numerator:" + numerator2 + " denominator:" + denominator2;
-    	// System.out.println(returnForTest);
-    	// Those were for Checkpoint 2. Remove later.
-    	
-        // Checkpoint 1: Return the second operand.  Example "4/5 * 1_2/4" returns "1_2/4".
-        // Checkpoint 2: Return the second operand as a string representing each part.
-        //               Example "4/5 * 1_2/4" returns "whole:1 numerator:2 denominator:4".
-        // Checkpoint 3: Evaluate the formula and return the result as a fraction.
-        //               Example "4/5 * 1_2/4" returns "6/5".
-        //               Note: Answer does not need to be reduced, but it must be correct.
-        // Final project: All answers must be reduced.
-        //               Example "4/5 * 1_2/4" returns "1_1/5".
     	
     	// Now, it starts calculating the unsimplified result based on which operator was used.
         // First, it converts mixed numbers to improper fractions for both operands.
@@ -96,15 +80,16 @@ public class FracCalc {
     	int numeResult = 0; // Gotta initialize these to something. Hope it doesn't cause problems.
     	int denomResult = 1;
     	
-    	if (operator.equals("+") || operator.equals("-")) {
-        	if (denominator1 != denominator2) { // Converts the two fractions into having a common denominator if they don't have one already
+    	if (operator.equals("+") || operator.equals("-")) { // Grouped together because those operations require a common denominator
+    		// Converts the two fractions into having a common denominator if they don't have one already
+    		if (denominator1 != denominator2) { 
         		denomResult = leastCommonMultiple(denominator1, denominator2);
         		numerator1 *= (denomResult / denominator1);
         		numerator2 *= (denomResult / denominator2);
         	} else {
-        		denomResult = denominator1; // If the denominators are already the same, then they already have a commonDenom.
+        		denomResult = denominator1; // If the denominators are already the same, then they already have a common denominaor.
         	} 
-
+    		// This is where it does the math
         	if (operator.equals("+")) {
         		numeResult = numerator1 + numerator2; 
         	} else if (operator.equals("-")) {
@@ -117,48 +102,70 @@ public class FracCalc {
     	} else if (operator.equals("/")) {
     		numeResult = numerator1 * denominator2; // This makes sense because you "flip" the second fraction when dividing
     		denomResult = denominator1 * numerator2;
-    	} else {
+    	} else { // If it doesn't see one of the four accepted operators
     		System.out.println("No operator entered.");
     	}
+    	
+    	// Fail-safe.
+    	if (numeResult > 0 && denomResult < 0) { // in which case the number would be negative
+    		numeResult *= -1; // We switch the signs because the program only works correctly if the numerator is the negative number.
+    		denomResult *= -1;
+    	}
         
-    	// for final version, do the simplification (reduce and have whole number) before returning
+    	// Simplification process:
+    	int wholeResult = numeResult / denomResult; // Divides, but truncates the result because it's an int.
+    	int tempNume = numeResult; // Never printed but this helps determine whether the answer's a fraction or mixed number.
+    	numeResult %= denomResult; // The remainder is the numerator, now reduced down so that it no longer makes an improper fraction.
+    	// This is the remainder that was ignored in determining a value for wholeResult.
     	
-    	String fracResult = numeResult + "/" + denomResult; 
+    	// Reducing the fraction:
+    	int factor = greatestCommonDivisor(numeResult, denomResult);
+    	if (factor != 1) {
+    		numeResult /= factor;
+    		denomResult /= factor;
+    	}
     	
-    	// return returnForTest; // for Checkpoint 2
-        return fracResult; // for Checkpoint 3
+    	// Getting the output to look nice (making it so it doesn't print unnecessary underscores and 0's and dashes)
+    	// Under no circumstances should the printed answer have a negative sign in front of the denominator.
+    	String answer = "";
+    	if (wholeResult == 0) { // Proper fraction.
+    		answer = numeResult + "/" + Math.abs(denomResult); // The default. It'll be overwritten if the condition below is true.
+    		 if (tempNume == 0) { // Meaning that the whole thing = 0
+    			answer = "0"; // since otherwise it would print "0/1" which is not simplified
+    		}
+    	} else if (numeResult == 0) { // Whole number.
+    		answer = "" + wholeResult;
+    	}
+    	else { // Mixed number.
+    		answer = wholeResult + "_" + Math.abs(numeResult) + "/" + Math.abs(denomResult);
+    		// Even though the numerator is stored as negative for negative numbers, we don't need to print a 
+    		// negative in front of it if it's a mixed number.
+    	}
+    	
+    	return answer;
     }
 
-    // TODO: Fill in the space below with helper methods
     
-   public static boolean isPositive(String num) { // I had to write this method to account for negative numbers
-    	boolean positive = true;
-    	if (num.charAt(0) == '-') { // If it starts with a negative sign
-    		positive = false; // then it's not positive (it's negative).
-    	}
-    	return positive;
-    }
+    // Helper methods begin here.
     
     public static int findWhole(String num) { // Finds the whole number in either the first or second operand
     	int whole = 0; // Will be changed unless the operand starts at the numerator, in which case it is true anyway.
     	String temp = ""; // will be used
-    	boolean wholeFound = false;
     	
-    	for (int i = 0; i < num.length(); i++) { // We can start at 0 because now the 1st and 2nd operands are in their own strings
-    		if (num.charAt(i) == '_' || num.charAt(i) == ' ') { // These symbols always mark the end of the whole number if there is one
-    			// so I used it as a point to find the whole number with
-    			// Then it assigns the whole number value
-    			temp = num.substring(0, i); 
-    			whole = Integer.parseInt(temp);
-    			wholeFound = true;
-    		} 
-    		else if (num.charAt(i) == '/') { // Indicates that the program has found a numerator first, which means there's no whole number
-    			wholeFound = true; // So, if it starts right at the numerator, the whole would be 0
+    	if (num.contains("_")) { // meaning it's a mixed number
+    		for (int i = 0; i < num.length(); i++) { 
+	    		if (num.charAt(i) == '_') { // This always marks the end of the whole number if there is one
+	    			// so I used it as a point to find the whole number with
+	    			// Then it assigns the whole number value
+	    			
+	    			temp = num.substring(0, i); // We can start at 0 because now the 1st and 2nd operands are in their own strings
+	    			whole = Integer.parseInt(temp);
+	    		} 
     		}
-    	} 
-    	if (wholeFound == false) { // If the method, after traversing the whole operand string, can't find a "_", 
-	    	whole = Integer.parseInt(num); // then the whole thing is the whole number.
-		 } // This is useful if there's no symbol marking the end of the whole number.
+    	} else if (num.contains("/") == false) { // If it's a whole number
+    		whole = Integer.parseInt(num);
+    	} // And if neither of these happen then it's a fraction, in which case whole = 0 is true.
+    	
     	return whole;
     }
     
@@ -174,7 +181,8 @@ public class FracCalc {
     			numerator = Integer.parseInt(temp);
     		}
     	}
-    	if (num.charAt(0) == '-' && num.contains("_") == true) { // Checking if the operand is negative or not since the numerator wouldn't be positive in a negative number
+    	if (num.charAt(0) == '-' && num.contains("_") == true) { 
+    		// Checking if the operand is negative or not since the numerator wouldn't be positive in a negative number
     		// so we need to make it negative (the program thinks it's positive because there's no "-" right in front of the numerator)
     		// -1_2/3 is not the same thing as -1 + 2/3
     		// It's actually -1 + -2/3
@@ -197,7 +205,6 @@ public class FracCalc {
     	}
     	return denominator;
     }
-    
     
     /**
      * greatestCommonDivisor - Find the largest integer that evenly divides two integers.
